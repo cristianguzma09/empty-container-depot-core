@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: empty-container-depot-core
+
+  datasource:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:sqlserver://localhost;instanceName=SQLEXPRESS;databaseName=EmptyContainerDepotDB;encrypt=false;trustServerCertificate=true
+    username: ecd_app
+    password: EcdApp#2026!
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none   # como ya hay script T-SQL, no autogenerar tablas
+    properties:
+    show-sql: true
+
