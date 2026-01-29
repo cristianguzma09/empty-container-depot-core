@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   application:
@@ -15,6 +15,10 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: none   # como ya hay script T-SQL, no autogenerar tablas
-    properties:
     show-sql: true
-
+    properties:
+      hibernate:
+        naming:
+          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+          implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+        format_sql: true
