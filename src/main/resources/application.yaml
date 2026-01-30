@@ -13,12 +13,14 @@ spring:
 
   jpa:
     open-in-view: false
+    database-platform: org.hibernate.dialect.SQLServerDialect
     hibernate:
-      ddl-auto: none   # como ya hay script T-SQL, no autogenerar tablas
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
     show-sql: true
     properties:
       hibernate:
-        naming:
-          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-          implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
         format_sql: true
+        default_schema: dbo
