@@ -2,11 +2,13 @@ package com.ecd.core.application.usecase;
 
 import com.ecd.core.application.dto.CreateOwnerRequest;
 import com.ecd.core.application.dto.OwnerResponse;
+import com.ecd.core.application.dto.UpdateOwnerRequest;
 import com.ecd.core.application.port.in.OwnerUseCase;
 import com.ecd.core.application.port.out.OwnerRepositoryPort;
 import com.ecd.core.domain.exception.ConflictException;
 import com.ecd.core.domain.exception.NotFoundException;
 import com.ecd.core.domain.model.Owner;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,4 +68,21 @@ public class OwnerService implements OwnerUseCase {
                 o.getCreatedAt()
         );
     }
+
+    public OwnerResponse update(Integer id, UpdateOwnerRequest request){
+        Owner existing = ownerRepo.findById(id).orElseThrow(() -> new NotFoundException("Owner not found id=" + id));
+
+        Owner updated = new Owner(
+            existing.getOwnerId(),
+            request.ownerCode(),
+            request.ownerName(),
+            request.repairTaxRate(),
+            request.isActive(),
+            existing.getCreatedAt()
+        );
+        Owner saved = ownerRepo.save(updated);
+
+        return toResponse(saved);
+    }
+
 }

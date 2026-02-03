@@ -2,6 +2,7 @@ package com.ecd.core.adapter.in.web;
 
 import com.ecd.core.application.dto.CreateOwnerRequest;
 import com.ecd.core.application.dto.OwnerResponse;
+import com.ecd.core.application.dto.UpdateOwnerRequest;
 import com.ecd.core.application.port.in.OwnerUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/owners")
 public class OwnerController {
@@ -36,5 +38,11 @@ public class OwnerController {
     @GetMapping
     public List<OwnerResponse> list() {
         return ownerUseCase.list();
+    }
+
+
+    @PutMapping("/{id}")
+    public OwnerResponse update(@PathVariable Integer id, @Valid @RequestBody UpdateOwnerRequest request){
+        return ownerUseCase.update(id, request);
     }
 }
