@@ -1,173 +1,100 @@
 package com.ecd.core.domain.model;
 
-import jakarta.persistence.*;
-
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-
-@Entity
-@Table(name = "Container")
 public class Container {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ContainerID")
-    private Long id;
-
-    @Column(name = "ContainerNumber", nullable = false, unique = true, length = 11)
-    private String containerNumber;
-
-    @Column(name = "ISOCode", nullable = false, length = 4)
-    private String isoCode;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "OwnerID", nullable = false)
-    private Owner owner;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "Status", nullable = false)
+    private final Long id;
+    private final String containerNumber;
+    private final String isoCode;
+    private final ContainerSize size;
+    private final Owner owner;
     private ContainerStatus status;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CurrentLocationID")
     private Location currentLocation;
+    private final Integer manufactureYear;
+    private final BigDecimal tareWeight;
+    private final BigDecimal maxGrossWeight;
+    private boolean active;
+    private final LocalDateTime createdAt;
 
-    @Column(name = "ManufactureYear")
-    private Integer manufactureYear;
-
-    @Column(name = "TareWeight")
-    private  Integer tareWeight;
-
-    @Column(name = "MaxGrossWeight")
-    private Integer maxGrossWeight;
-
-    @Column(name = "IsActive")
-    private Boolean isActive;
-
-    @Column(name = "CreatedAt", updatable = false)
-    private LocalDateTime createdAt;
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getContainerNumber() {
-        return containerNumber;
-    }
-
-    public void setContainerNumber(String containerNumber) {
-        this.containerNumber = containerNumber;
-    }
-
-    public String getIsoCode() {
-        return isoCode;
-    }
-
-    public void setIsoCode(String isoCode) {
-        this.isoCode = isoCode;
-    }
-
-    public Owner getOwner() {
-        return owner;
-    }
-
-    public void setOwner(Owner owner) {
-        this.owner = owner;
-    }
-
-    public ContainerStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ContainerStatus status) {
-        this.status = status;
-    }
-
-    public Location getCurrentLocation() {
-        return currentLocation;
-    }
-
-    public void setCurrentLocation(Location currentLocation) {
-        this.currentLocation = currentLocation;
-    }
-
-    public Integer getManufactureYear() {
-        return manufactureYear;
-    }
-
-    public void setManufactureYear(Integer manufactureYear) {
-        this.manufactureYear = manufactureYear;
-    }
-
-    public Integer getTareWeight() {
-        return tareWeight;
-    }
-
-    public void setTareWeight(Integer tareWeight) {
-        this.tareWeight = tareWeight;
-    }
-
-    public Integer getMaxGrossWeight() {
-        return maxGrossWeight;
-    }
-
-    public void setMaxGrossWeight(Integer maxGrossWeight) {
-        this.maxGrossWeight = maxGrossWeight;
-    }
-
-    public Boolean getActive() {
-        return isActive;
-    }
-
-    public void setActive(Boolean active) {
-        isActive = active;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-
-
-    /*-------------lifecycle hooks-------------*/
-
-    protected void onCreate()
-    {
-        this.createdAt = LocalDateTime.now();
-        this.isActive = true;
-        if (this.status == null)
-        {
-            this.status = ContainerStatus.IN_DEPOT;
+    public Container(
+            Long id,
+            String containerNumber,
+            String isoCode,
+            ContainerSize size,
+            Owner owner,
+            ContainerStatus status,
+            Location currentLocation,
+            Integer manufactureYear,
+            BigDecimal tareWeight,
+            BigDecimal maxGrossWeight,
+            boolean active,
+            LocalDateTime createdAt
+    ) {
+        if (containerNumber == null || containerNumber.isBlank()) {
+            throw new IllegalArgumentException("Container number is required");
         }
+        if (isoCode == null || isoCode.isBlank()) {
+            throw new IllegalArgumentException("ISO code is required");
+        }
+        if (size == null) {
+            throw new IllegalArgumentException("Container size is required");
+        }
+        if (owner == null) {
+            throw new IllegalArgumentException("Owner is required");
+        }
+        if (tareWeight != null && tareWeight.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Tare weight cannot be negative");
+        }
+        if (maxGrossWeight != null && maxGrossWeight.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Max gross weight cannot be negative");
+        }
+
+        this.id = id;
+        this.containerNumber = containerNumber.trim();
+        this.isoCode = isoCode.trim();
+        this.size = size;
+        this.owner = owner;
+        this.status = Objects.requireNonNullElse(status, ContainerStatus.IN_DEPOT);
+        this.currentLocation = currentLocation;
+        this.manufactureYear = manufactureYear;
+        this.tareWeight = tareWeight;
+        this.maxGrossWeight = maxGrossWeight;
+        this.active = active;
+        this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
     }
 
-    /*-------------Domain Helpers-------------*/
+    /*------------- Domain behavior -------------*/
 
-    public void changeStatus(ContainerStatus newStatus)
-    {
+    public void changeStatus(ContainerStatus newStatus) {
+        if (newStatus == null) {
+            throw new IllegalArgumentException("New status cannot be null");
+        }
         this.status = newStatus;
     }
 
-    public void assignLocation(Location location)
-    {
+    public void assignLocation(Location location) {
         this.currentLocation = location;
     }
 
-    public void deactivate()
-    {
-        this.isActive = false;
+    public void deactivate() {
+        this.active = false;
     }
 
+    /*------------- Getters -------------*/
 
-
-
+    public Long getId() { return id; }
+    public String getContainerNumber() { return containerNumber; }
+    public String getIsoCode() { return isoCode; }
+    public ContainerSize getSize() { return size; }
+    public Owner getOwner() { return owner; }
+    public ContainerStatus getStatus() { return status; }
+    public Location getCurrentLocation() { return currentLocation; }
+    public Integer getManufactureYear() { return manufactureYear; }
+    public BigDecimal getTareWeight() { return tareWeight; }
+    public BigDecimal getMaxGrossWeight() { return maxGrossWeight; }
+    public boolean isActive() { return active; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }
